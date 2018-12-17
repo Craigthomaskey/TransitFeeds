@@ -28,3 +28,19 @@ E:\TransitFeeds\TransitFeeds\bin\Debug\Newtonsoft.Json.xml
 E:\TransitFeeds\TransitFeeds\obj\Debug\TransitFeeds.csproj.CopyComplete
 E:\TransitFeeds\TransitFeeds\bin\Debug\GMap.NET.Core.dll
 E:\TransitFeeds\TransitFeeds\bin\Debug\GMap.NET.WindowsForms.dll
+C:\Users\Craig Key\Source\Repos\TransitFeeds\TransitFeeds\TransitFeeds\bin\Debug\TransitFeeds.exe.config
+C:\Users\Craig Key\Source\Repos\TransitFeeds\TransitFeeds\TransitFeeds\bin\Debug\TransitFeeds.exe
+C:\Users\Craig Key\Source\Repos\TransitFeeds\TransitFeeds\TransitFeeds\bin\Debug\TransitFeeds.pdb
+C:\Users\Craig Key\Source\Repos\TransitFeeds\TransitFeeds\TransitFeeds\bin\Debug\GMap.NET.Core.dll
+C:\Users\Craig Key\Source\Repos\TransitFeeds\TransitFeeds\TransitFeeds\bin\Debug\GMap.NET.WindowsForms.dll
+C:\Users\Craig Key\Source\Repos\TransitFeeds\TransitFeeds\TransitFeeds\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Craig Key\Source\Repos\TransitFeeds\TransitFeeds\TransitFeeds\bin\Debug\Newtonsoft.Json.pdb
+C:\Users\Craig Key\Source\Repos\TransitFeeds\TransitFeeds\TransitFeeds\bin\Debug\Newtonsoft.Json.xml
+C:\Users\Craig Key\Source\Repos\TransitFeeds\TransitFeeds\TransitFeeds\obj\Debug\TransitFeeds.csprojAssemblyReference.cache
+C:\Users\Craig Key\Source\Repos\TransitFeeds\TransitFeeds\TransitFeeds\obj\Debug\TransitFeeds.Form1.resources
+C:\Users\Craig Key\Source\Repos\TransitFeeds\TransitFeeds\TransitFeeds\obj\Debug\TransitFeeds.Properties.Resources.resources
+C:\Users\Craig Key\Source\Repos\TransitFeeds\TransitFeeds\TransitFeeds\obj\Debug\TransitFeeds.csproj.GenerateResource.cache
+C:\Users\Craig Key\Source\Repos\TransitFeeds\TransitFeeds\TransitFeeds\obj\Debug\TransitFeeds.csproj.CoreCompileInputs.cache
+C:\Users\Craig Key\Source\Repos\TransitFeeds\TransitFeeds\TransitFeeds\obj\Debug\TransitFeeds.csproj.CopyComplete
+C:\Users\Craig Key\Source\Repos\TransitFeeds\TransitFeeds\TransitFeeds\obj\Debug\TransitFeeds.exe
+C:\Users\Craig Key\Source\Repos\TransitFeeds\TransitFeeds\TransitFeeds\obj\Debug\TransitFeeds.pdb
