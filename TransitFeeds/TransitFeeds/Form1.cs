@@ -165,7 +165,7 @@ namespace TransitFeeds
                 string ID = v.shape_id;
                 float SequenceNumber = v.shape_pt_sequence;
                 float LAT = v.shape_pt_lat; float LON = v.shape_pt_lon;
-
+                  
                 if (!ShapeData.ContainsKey(ID))
                 {
                     ShapeData.Add(ID, new SortedDictionary<float, List<float>>() { { SequenceNumber, new List<float>() { LAT, LON } } });
