@@ -72,7 +72,7 @@ namespace TransitFeeds
                 Positions.Add(ID, list);
                 TrainNames.Add(ID, RouteID + " : " + VID);
             }
-            GMapOverlay markersOverlay = new GMapOverlay("markers");
+            GMapOverlay markersOverlay = new GMapOverlay("MetraPostions");
             foreach (var v in Positions)
             {
                 PointLatLng PLL = new PointLatLng(v.Value[0], v.Value[1]);
@@ -102,7 +102,7 @@ namespace TransitFeeds
                 if (StopZones.ContainsKey(zone)) StopZones[zone].Add(ID);
                 else StopZones.Add(zone, new List<string>() { ID });
             }
-            GMapOverlay stopsOverlay = new GMapOverlay("stops");
+            GMapOverlay stopsOverlay = new GMapOverlay("MetraStops");
 
             foreach (var stop in StopLocations)
             {
@@ -113,27 +113,19 @@ namespace TransitFeeds
                 {
                     if (StopUrlDict[stop.Key].Contains(v.Key))
                     {
-                        Bitmap Bmp = new Bitmap(10, 10);
+                        Bitmap Bmp = new Bitmap(5, 5);
                         for (int h = 0; h < Bmp.Height; h++)
                         {
                             for (int w = 0; w < Bmp.Width; w++)
                             {
-                                Bmp.SetPixel(w, h, ColorTranslator.FromHtml("#" + v.Value[1]));
+                                Bmp.SetPixel(w, h, Color.Black); // this should be colors per, but broken //ColorTranslator.FromHtml("#" + v.Value[1]));
                             }
                         }
-
-
                         GMapMarker marker = new GMarkerGoogle(PLL,Bmp);
                         marker.ToolTipText = StopNames[stop.Key];
                         stopsOverlay.Markers.Add(marker);
                     }
                 }
-
-
-
-
-
-
             }
             MainForm.OverlayPermant(stopsOverlay);
         }
@@ -151,9 +143,10 @@ namespace TransitFeeds
                 else if (!ShapeData[ID].ContainsKey(SequenceNumber))                {                    ShapeData[ID].Add(SequenceNumber, new List<float>() { LAT, LON });                }
             }            
 
-            GMapOverlay polygons = new GMapOverlay("polygons");
+            GMapOverlay polygons = new GMapOverlay("MetraRoutes");
             foreach (var shape in ShapeData)
             {
+                string JustLine = shape.Key.Substring(0, shape.Key.Length - 5);
                 List<PointLatLng> points = new List<PointLatLng>();
                 foreach (var point in shape.Value)
                 {
@@ -165,9 +158,10 @@ namespace TransitFeeds
 
                 foreach (var v in RouteDetailsDict)
                 {
-                    if (shape.Key.Contains(v.Key))
+                    if (JustLine == v.Key)
                     {
-                        route.Stroke = new Pen(ColorTranslator.FromHtml("#" + v.Value[1]), 5);
+                        route.Stroke = new Pen(ColorTranslator.FromHtml("#" + v.Value[1]+"ff"), 5);
+                        break;
                     }
                 }
 
