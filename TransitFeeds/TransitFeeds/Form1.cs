@@ -26,174 +26,103 @@ namespace TransitFeeds
             InitializeComponent();
         }
 
+        MetraData MD; DivvyData DD;
         private void Form1_Load(object sender, EventArgs e)
         {
-            gMap.MapProvider = GMap.NET.MapProviders.GoogleMapProvider.Instance;
+            MainMap.MapProvider = GMap.NET.MapProviders..Instance;
             GMaps.Instance.Mode = AccessMode.ServerAndCache;
-            gMap.Position = new PointLatLng(41.881832, -87.623177);
-            GetPositions(GET("https://gtfsapi.metrarail.com/gtfs/positions"));
-            GetRoutes(GET("https://gtfsapi.metrarail.com/gtfs/schedule/stops"));
-            PositionsButton.Enabled = true;
-            foreach (var v in Positions)
-            {
-                MainFeed.Text = MainFeed.Text + v.Key + " : " + v.Value[0] + " , " + v.Value[0] + Environment.NewLine;
-            }
-            PositionsButton.PerformClick();
+            MainMap.Position = new PointLatLng(41.881832, -87.623177);
+            ZoomLabel.Text = ZoomBar.Value.ToString() + "%";
+            MainMap.Zoom = ZoomBar.Value; MainMap.ShowCenter = false;
+
+
+            MD = new MetraData(); MD.Init(this);
+            MD.RouteDetails(); MD.GetRoutes();            MD.GetStops();
+            MD.GetPositions();
+
+            DD = new DivvyData(); DD.Init(this);
+            DD.GetPositions();
         }
 
-        string GET(string url)
+        private void UpdateButton_Click(object sender, EventArgs e)
         {
-            string username = "fc9a6873a68bc45e909e3d3bacaa1dd3";
-            string password = "a6bf1d34173884b3b9e46d413d54650d";
-
-            var req = (HttpWebRequest)WebRequest.Create(url);
-            req.Credentials = new NetworkCredential(username, password);
-            var response = req.GetResponse();
-
-            Stream Strm = response.GetResponseStream();
-            StreamReader StrmRdr = new StreamReader(Strm);
-            return StrmRdr.ReadToEnd();
+            MD.GetPositions();
         }
-
-
-        private void CopyButton_Click(object sender, EventArgs e)
-        {
-            Clipboard.SetText(MainFeed.Text);
-        }
-
-        Dictionary<string, List<float>> Positions = new Dictionary<string, List<float>>();
-        void GetPositions(string jsonData)
-        {
-            Positions.Clear();
-
-            dynamic result = Newtonsoft.Json.JsonConvert.DeserializeObject(jsonData);
-
-            foreach(var v in result)
-            {
-                string ID = v.vehicle.vehicle.id;
-                float Lat = v.vehicle.position.latitude; float Lon = v.vehicle.position.longitude;
-                List<float> list = new List<float>() { Lat, Lon };
-                Positions.Add(ID, list);
-
-            }
-        }
-
-        Dictionary<string, List<float>> StopLocations = new Dictionary<string, List<float>>();
-        Dictionary<string, string> StopNames = new Dictionary<string, string>();
-        Dictionary<string, List<string>> StopZones = new Dictionary<string, List<string>>();
-
-        void GetRoutes(string jsonData)
-        {
-            StopLocations.Clear(); StopNames.Clear(); StopZones.Clear();
-
-            dynamic result = Newtonsoft.Json.JsonConvert.DeserializeObject(jsonData);
-
-            foreach (var v in result)
-            {
-                string ID = v.stop_id;
-                float Lat = v.stop_lat;
-                float Lon = v.stop_lon;
-                string name = v.stop_name;
-                string zone = v.zone_id;
-                List<float> list = new List<float>() { Lat, Lon };
-                StopLocations.Add(ID, list); StopNames.Add(ID, name);
-
-                if (StopZones.ContainsKey(zone)) StopZones[zone].Add(ID);
-                else StopZones.Add(zone, new List<string>() { ID });
-            }
-        }
-
-        private void PositionsButton_Click(object sender, EventArgs e)
-        {
-            MainFeed.Text = "";
-            GetPositions(GET("https://gtfsapi.metrarail.com/gtfs/positions"));
-            GetRoutes(GET("https://gtfsapi.metrarail.com/gtfs/schedule/stops"));
-            foreach (var v in Positions)
-            {
-                MainFeed.Text = MainFeed.Text + v.Key + " : " + v.Value[0] + " , " + v.Value[0] + Environment.NewLine;
-            }
-            UpdateMap();
-        }
-
-        GMapOverlay stopsOverlay;
-        GMapOverlay markersOverlay;
-        void UpdateMap()
-        {
-            gMap.Overlays.Clear();
-
-            if (stopsOverlay != null) stopsOverlay.Clear(); else stopsOverlay = new GMapOverlay("stops");
-
-            foreach (var v in StopLocations)
-            {
-                PointLatLng PLL = new PointLatLng(v.Value[0], v.Value[1]);
-                GMapMarker marker = new GMarkerGoogle(PLL, GMarkerGoogleType.black_small);
-                marker.ToolTipText = v.Key;
-                stopsOverlay.Markers.Add(marker);
-            }
-            gMap.Overlays.Add(stopsOverlay);
-
-            if (markersOverlay != null) markersOverlay.Clear(); else markersOverlay = new GMapOverlay("markers");
-            foreach (var v in Positions)
-            {
-                PointLatLng PLL = new PointLatLng(v.Value[0], v.Value[1]);
-                GMapMarker marker = new GMarkerGoogle(PLL, GMarkerGoogleType.blue_pushpin);
-                marker.ToolTipText = v.Key;
-                markersOverlay.Markers.Add(marker);
-            }
-            gMap.Overlays.Add(markersOverlay);
-        }
-
         private void UpdateTimer_Tick(object sender, EventArgs e)
         {
-            PositionsButton.PerformClick();            
+            if(TimerCheck.Checked)
+            UpdateButton.PerformClick();
         }
 
-        private void ShapesBttn_Click(object sender, EventArgs e)
+        List<GMapOverlay> GMOPerm = new List<GMapOverlay>();
+        public void OverlayPermant(GMapOverlay Overlay)
         {
-            OverlayShapes(GET("https://gtfsapi.metrarail.com/gtfs/schedule/shapes"));
-            ShapesBttn.Enabled = false;
+            MainMap.Zoom = MainMap.Zoom + 1;
+            MainMap.Overlays.Add(Overlay);
+            GMOPerm.Add(Overlay);
+          //  gMap.ZoomAndCenterMarkers(Overlay.Id);
+            MainMap.Zoom = MainMap.Zoom - 1;
         }
-
-        Dictionary<string, SortedDictionary<float, List<float>>> ShapeData = new Dictionary<string, SortedDictionary<float, List<float>>>();
-
-        void OverlayShapes(string jsonData)
+        List<GMapOverlay> GMOTemp = new List<GMapOverlay>();
+        public void OverlayTemp(GMapOverlay Overlay)
         {
-            dynamic result = Newtonsoft.Json.JsonConvert.DeserializeObject(jsonData);
-
-            foreach (var v in result)
+            if (GMOTemp.Count > 0)
             {
-                string ID = v.shape_id;
-                float SequenceNumber = v.shape_pt_sequence;
-                float LAT = v.shape_pt_lat; float LON = v.shape_pt_lon;
-                  
-                if (!ShapeData.ContainsKey(ID))
+                for (int i = 0; i < GMOTemp.Count; i++)
                 {
-                    ShapeData.Add(ID, new SortedDictionary<float, List<float>>() { { SequenceNumber, new List<float>() { LAT, LON } } });
+                    if (GMOTemp[i].Id == Overlay.Id)
+                    {
+                        MainMap.Overlays.Remove(GMOTemp[i]);
+                        GMOTemp[i].Dispose();
+                        GMOTemp.Remove(GMOTemp[i]);
+                    }
                 }
-                else if(!ShapeData[ID].ContainsKey(SequenceNumber))
-                {
-                    ShapeData[ID].Add(SequenceNumber, new List<float>() { LAT, LON });
-                }
-            }
-
-
-
-            GMapOverlay polygons = new GMapOverlay("polygons");
-            foreach (var shape in ShapeData)
-            {
-                List<PointLatLng> points = new List<PointLatLng>();
-                foreach(var point in shape.Value)
-                {
-                    points.Add(new PointLatLng(point.Value[0], point.Value[1]));
-                }
-                GMapRoute route = new GMapRoute(points, shape.Key);
-                route.Stroke = new Pen(Color.Red, 3);
-                polygons.Routes.Add(route);           
-            }
-            gMap.Overlays.Add(polygons);
-
+            }            
+            MainMap.Overlays.Add(Overlay);
+            foreach (GMapMarker mark in Overlay.Markers)
+                MainMap.UpdateMarkerLocalPosition(mark);
+            MainMap.Refresh();
+            GMOTemp.Add(Overlay);
+            OverlayVisibleCheck();
         }
 
+        private void ZoomBar_ValueChanged(object sender, EventArgs e)
+        {
+            ZoomLabel.Text = (ZoomBar.Value * 4).ToString() + "%";
+            MainMap.Zoom = ZoomBar.Value;
+        }
+
+        private void MainMap_OnMapZoomChanged()
+        {
+            if (MainMap.Zoom > 20) MainMap.Zoom = 20;
+            ZoomBar.Value = Convert.ToInt32(MainMap.Zoom);
+            ZoomLabel.Text = ZoomBar.Value.ToString() + "%";
+        }
+
+        private void MetaCheck_CheckedChanged(object sender, EventArgs e) => OverlayVisibleCheck();
+        private void DivvyCheck_CheckedChanged(object sender, EventArgs e) => OverlayVisibleCheck();
+        private void CTATrainsCheck_CheckedChanged(object sender, EventArgs e) => OverlayVisibleCheck();
+        void OverlayVisibleCheck()
+        {
+            foreach (GMapOverlay ovly in GMOTemp)
+                if (ovly.Id.Contains("Metra"))
+                    ovly.IsVisibile = MetaCheck.Checked;
+            foreach (GMapOverlay ovly in GMOPerm)
+                if (ovly.Id.Contains("Metra"))
+                    ovly.IsVisibile = MetaCheck.Checked;
+            foreach (GMapOverlay ovly in GMOTemp)
+                if (ovly.Id.Contains("Divvy"))
+                    ovly.IsVisibile = DivvyCheck.Checked;
+            foreach (GMapOverlay ovly in GMOPerm)
+                if (ovly.Id.Contains("Divvy"))
+                    ovly.IsVisibile = DivvyCheck.Checked;
+            foreach (GMapOverlay ovly in GMOTemp)
+                if (ovly.Id.Contains("CTATrains"))
+                    ovly.IsVisibile = CTATrainsCheck.Checked;
+            foreach (GMapOverlay ovly in GMOPerm)
+                if (ovly.Id.Contains("CTATrains"))
+                    ovly.IsVisibile = CTATrainsCheck.Checked;
+        }
     }
 
 }
